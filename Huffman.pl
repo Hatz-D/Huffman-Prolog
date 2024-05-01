@@ -5,12 +5,29 @@ main():-
     string_chars(String, Chars),
     loop(Chars, Binario, String),
     remover_duplicatas(Binario, BinarioSemDuplicatas),
-    salvar_arquivo(BinarioSemDuplicatas, "out.txt").
+    salvar_arquivo(BinarioSemDuplicatas, Chars, "out.txt").
 
-salvar_arquivo(String, NomeArquivo) :-
+% Função para salvar o conteúdo do arquivo de saída, sendo composto da tabela de caracteres e do arquivo codificado
+salvar_arquivo(BinarioSemDuplicatas, Chars, NomeArquivo) :-
     open(NomeArquivo, write, Arquivo),
-    write(Arquivo, String),
+    write(Arquivo, BinarioSemDuplicatas),
+    write(Arquivo, "\n"),
+    salvar_arquivo_loop(Arquivo, BinarioSemDuplicatas, Chars).
+
+salvar_arquivo_loop(Arquivo, _, []) :-
     close(Arquivo).
+
+salvar_arquivo_loop(Arquivo, BinarioSemDuplicatas, [A|X]) :-
+    acha_codigo(BinarioSemDuplicatas, A, R),
+    write(Arquivo, R),
+    write(Arquivo, " "),
+    salvar_arquivo_loop(Arquivo, BinarioSemDuplicatas, X).
+
+% Função para achar o código binário de dado caractere
+acha_codigo([_|Z], Char, R) :-
+    acha_codigo(Z, Char, R).
+
+acha_codigo([(Char, Binario)|_], Char, Binario).
 
 % Função que cria uma lista de tuplas com os caracteres do arquivo e os seus respectivos binários
 loop([], [], _).
