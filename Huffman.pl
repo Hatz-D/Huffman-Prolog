@@ -1,5 +1,26 @@
-% Função para rodar o programa
-main():-
+% Função para codificar o arquivo 'in.txt' no arquivo 'out.txt' e depois decodifica-lo no arquivo 'decod.txt'
+main() :-
+    main_cod(BinarioSemDuplicatas), 
+    main_decod(BinarioSemDuplicatas).
+
+% Função para decodificar o arquivo
+main_decod(BinarioSemDuplicatas) :-
+    open('out.txt', read, Arquivo),
+    read_string(Arquivo, _, String),
+    split_string(String, " ", "", ListaString),
+    close(Arquivo),
+    open("decod.txt", write, Stream),
+    loop_escrita(Stream, BinarioSemDuplicatas, ListaString).
+
+loop_escrita(Stream, _, []) :- close(Stream).
+
+loop_escrita(Stream, BinarioSemDuplicatas, [A|X]) :-
+    acha_codigo(BinarioSemDuplicatas, R, A),
+    write(Stream, R),
+    loop_escrita(Stream, BinarioSemDuplicatas, X).
+
+% Função para codificar o programa
+main_cod(BinarioSemDuplicatas):-
     open('in.txt', read, Arquivo),
     read_string(Arquivo, _, String),
     string_chars(String, Chars),
@@ -10,18 +31,26 @@ main():-
 % Função para salvar o conteúdo do arquivo de saída, sendo composto da tabela de caracteres e do arquivo codificado
 salvar_arquivo(BinarioSemDuplicatas, Chars, NomeArquivo) :-
     open(NomeArquivo, write, Arquivo),
-    write(Arquivo, BinarioSemDuplicatas),
-    write(Arquivo, "\n"),
-    salvar_arquivo_loop(Arquivo, BinarioSemDuplicatas, Chars).
+    salvar_arquivo_loop_primeiro(Arquivo, BinarioSemDuplicatas, Chars).
+
+salvar_arquivo_loop_primeiro(Arquivo, BinarioSemDuplicatas, [A|X]) :-
+    acha_codigo(BinarioSemDuplicatas, A, R),
+    write(Arquivo, R),
+    salvar_arquivo_loop(Arquivo, BinarioSemDuplicatas, X).
 
 salvar_arquivo_loop(Arquivo, _, []) :-
     close(Arquivo).
 
 salvar_arquivo_loop(Arquivo, BinarioSemDuplicatas, [A|X]) :-
     acha_codigo(BinarioSemDuplicatas, A, R),
-    write(Arquivo, R),
     write(Arquivo, " "),
+    write(Arquivo, R),
     salvar_arquivo_loop(Arquivo, BinarioSemDuplicatas, X).
+
+% Função para achar o caractere de dado código binário
+acha_caractere([_|Z], Char, R) :- acha_caractere(Z, Char, R).
+
+acha_caractere([(Char, Binario)|_], Char, Binario).
 
 % Função para achar o código binário de dado caractere
 acha_codigo([_|Z], Char, R) :-
